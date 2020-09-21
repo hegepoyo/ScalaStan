@@ -20,6 +20,7 @@ import com.typesafe.scalalogging.LazyLogging
 object CmdStanCompiler extends StanCompiler with CommandRunner with LazyLogging {
 
   lazy val CMDSTAN_HOME: Option[String] = sys.env.get("CMDSTAN_HOME")
+  lazy val CMDSTAN_MAKE_OPTION: Option[String] = sys.env.get("SCALA_STAN_MAKE_OPTION")
   val modelExecutable: String = "model"
   val stanFileName: String = s"$modelExecutable.stan"
   val cacheVersion: Int = 1
@@ -76,7 +77,7 @@ object CmdStanCompiler extends StanCompiler with CommandRunner with LazyLogging 
     val stanPath = stanHome.getOrElse {
       throw new IllegalStateException("Could not locate Stan.")
     }
-    val rc = runCommand(new File(stanPath), Seq(makeCommand, target))
+    val rc = runCommand(new File(stanPath), Seq(makeCommand, CMDSTAN_MAKE_OPTION.getOrElse(""), target))
     if (rc != 0) {
       throw new IllegalStateException(s"$make returned $rc")
     }
