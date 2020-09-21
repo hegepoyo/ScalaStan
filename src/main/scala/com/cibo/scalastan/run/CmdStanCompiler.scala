@@ -77,7 +77,13 @@ object CmdStanCompiler extends StanCompiler with CommandRunner with LazyLogging 
     val stanPath = stanHome.getOrElse {
       throw new IllegalStateException("Could not locate Stan.")
     }
-    val rc = runCommand(new File(stanPath), Seq(makeCommand, CMDSTAN_MAKE_OPTION.getOrElse(""), target))
+
+    val cmd = CMDSTAN_MAKE_OPTION match {
+      case Some(option) => Seq(makeCommand, cmd, target)
+      case _ => Seq(makeCommand, target)
+    }
+
+    val rc = runCommand(new File(stanPath), cmd)
     if (rc != 0) {
       throw new IllegalStateException(s"$make returned $rc")
     }
